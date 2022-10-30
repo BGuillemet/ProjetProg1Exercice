@@ -1,0 +1,69 @@
+\documentclass[french]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{babel}
+\usepackage{minted}
+\usepackage{framed}
+\usepackage{fancyhdr}
+%\renewcommand{\MintedPygmentize}{/Library/Frameworks/Python.framework/Versions/3.8/bin/pygmentize}
+\usepackage{geometry}
+\geometry{hmargin=2cm,vmargin=3cm}
+\pagestyle{fancy}
+\lhead{Benoît GUILLEMET}
+\rhead{}
+
+\begin{document}
+
+\part*{\begin{center} Projet Programmation 1\end{center}}
+
+
+\section{Implémentation générale}
+
+Le code se compose des fichiers suivants :
+\begin{itemize}
+\item \texttt{aritha.ml} contient le code principal qui appelle les autres fonctions et crée le fichier assembleur \texttt{expression.s} ;
+\item \texttt{asyntax.ml} définit l'arbre syntaxique ;
+\item \texttt{lexer.mll} est le fichier \texttt{ocamllex} qui crée l'analyseur lexical;
+\item \texttt{parser.mly} est le fichier \texttt{ocamlyacc} qui crée l'analyseur syntaxique (et en particulier s'occupe des questions de précédence);
+\item \texttt{typing.ml} vérifie que l'arbre syntaxique est bien typé, et fournit de plus le type de l'expression;
+\item \texttt{generator.ml} convertit une expression sous forme d'arbre syntaxique (obtenu en appelant le parser) en code assembleur;
+\item \texttt{functions.ml} contient les codes assembleur des fonctions puissance et factorielle (cf Bonus), qui sont ajoutées au code assembleur si elles doivent être appelées.
+\end{itemize}
+
+\vspace{0.5cm}
+
+\textbf{Remarque :} En testant avec l'expression $-3/2$, on obtient le résultat $-1$ (on pourrait s'attendre à obtenir -2), tandis qu'en testant avec $-3\%2$, on obtient 1. Ceci est dû à l'opérateur \texttt{idiv} de l'assembleur, qui fournit ces résultats.
+
+\vspace{0.5cm}
+
+Le répertoire \texttt{tests} contient une série de fichiers \texttt{.exp} et \texttt{.rep}. L'ensemble des tests peuvent être exécutés avec l'instruction \texttt{make test}. Il contient en particulier des tests pour les opérations bonus.
+
+
+\section{Bonus}
+
+\subsection{Opérations supplémentaires}
+
+On a ajouté les opérations suivantes : la puissance, la factorielle, et la division de flottants.
+
+\vspace{0.2cm}
+
+La division de flottants a la syntaxe suivante : \texttt{exp /. exp}. Elle prend en paramètre deux flottants, et calcule le flottant résultant de la division du premier par le deuxième. \\
+La puissance a la syntaxe suivante : \texttt{exp \^{} exp}. Elle prend en paramètre deux entiers et calcule la puissance du premier par le deuxième. Si l'exposant est négatif, elle renvoie 1. \\
+La factorielle a la syntaxe suivante : \texttt{exp!}. Elle prend en paramètre un entier et renvoie sa factorielle.
+
+\subsection{Variables}
+
+La gestion de variables a été implémentée. Une affectation d'une valeur (entière ou flottante) à une variable se fait sur une ligne, de la forme \texttt{var = exp}. Le code assembleur affiche la valeur de la première ligne qui n'est pas une affectation. Les noms de variables disponibles sont seulement les lettres minuscules : il ne peut donc y avoir que 26 variables. Ainsi un fichier \texttt{expression.exp} utilisant des variables est de la forme suivante :
+
+\begin{leftbar}
+\begin{minted}{text}
+x = 2
+y = float(x) -. 0.5
+int(y)-x
+\end{minted}
+\end{leftbar}
+
+Le programme renverrait ici la valeur : \texttt{-1}.
+
+
+\end{document}

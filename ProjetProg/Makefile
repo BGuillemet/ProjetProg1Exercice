@@ -10,7 +10,7 @@ lexer.ml: lexer.mll
 	ocamllex $^
 
 clean:
-	rm -rf *.cmi *.cmo *.cmx *.mli lexer.ml parser.ml aritha expression.s expression *.log *.aux _minted-rapport
+	rm -rf *.cmi *.cmo *.cmx *.mli lexer.ml parser.ml aritha *.log *.aux _minted-rapport
 
 test: aritha
 	@cd tests; \
@@ -18,14 +18,14 @@ test: aritha
 		f2=$${f%.exp}; \
 		echo -n "$$f2: "; \
 		../aritha $$f; \
-		gcc -no-pie expression.s -o expression; \
-		if cmp -s <( ./expression ) $$f2.rep; then \
+		gcc -no-pie $$f2.s -o $$f2; \
+		if cmp -s <( ./$$f2 ) $$f2.rep; then \
 			echo OK; \
 		else \
 			echo FAIL; \
-		fi \
+		fi; \
+		rm -f $$f2.s $$f2; \
 	done; \
-	rm -f expression.*
 
 rapport.pdf: rapport.tex
 	pdflatex -shell-escape $^

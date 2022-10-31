@@ -2,13 +2,15 @@ open X86_64
 
 let args = Sys.argv
 
-exception Wrong_number_of_arguments
+exception Wrong_arguments
 
 (* If no argument: read expression from standard input, else from the file in argument *)
-let chan = match Array.length args with
-    | 1 -> stdin 
-    | 2 -> open_in args.(1)
-    |_ -> raise Wrong_number_of_arguments
+let chan, name_output = match Array.length args with
+    | 1 -> stdin, "stdin.s"
+    | 2 -> if (String.sub args.(1) ((String.length args.(1) - 4)) 4) = ".exp" then
+           (open_in args.(1), (String.sub args.(1) 0 ((String.length args.(1) - 4)))^".s")
+           else raise Wrong_arguments
+    |_ -> raise Wrong_arguments
 
 let lexbuf = Lexing.from_channel chan;;
 
@@ -61,7 +63,7 @@ try
                 data = d ++
                        label "S_int" ++ string "%d\n" ++
                        label ".S_float" ++ string "%f\n"; } in
-     X86_64.print_in_file "expression.s" code;
+     X86_64.print_in_file name_output code;
 with
   Parsing.Parse_error -> prerr_endline "Parse_error"
   | Typing.Type_error -> prerr_endline "Type_error"
